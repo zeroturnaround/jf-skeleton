@@ -1,11 +1,11 @@
 package ee.ut.jf2013;
 
-import ee.ut.jf2013.hw1.HW;
+import ee.ut.jf2013.homework1.Homework;
 
 public class Main {
-  public static void main(String[] args) {
-    HW hw = new HW();
-    
-    System.out.println(hw.square(4));
-  }
+    public static void main(String[] args) {
+        Homework homework = new Homework();
+
+        System.out.println(homework.square(4));
+    }
 }
