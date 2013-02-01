@@ -6,7 +6,7 @@ project with a dependency on [Apache Commons Lang](http://commons.apache.org/lan
 JAR file that can be executed via
 
 ```shell
-java -jar target/jf2012-executable.jar
+java -jar target/jf2013-executable.jar
 ```
 
 Getting Started
@@ -18,7 +18,7 @@ Once you have the archive we will use Maven to build the project.
 ```shell
 cd jf-skeleton
 mvn install
-java -jar target/jf2012-executable.jar
+java -jar target/jf2013-executable.jar
 ```
 
 This builds and executes the project. The current project will print the number 16 (just an example). When we check your
@@ -28,10 +28,10 @@ to start your application.
 Assignment structure
 --------------------------
 
-The project has a source folder *src/main/java/ee/ut/jf2012/*. The sample is based on the first homework and
+The project has a source folder *src/main/java/ee/ut/jf2013/*. The sample is based on the first homework and
 also specifies a subfolder called *hw1*. You should change this depending on your assignment.
 
-The project also has a folder for tests. See *test/java/ee/ut/jf2012*. The sample is based on the first homework
+The project also has a folder for tests. See *test/java/ee/ut/jf2013*. The sample is based on the first homework
 and also specifies a folder *hw1*. You should change this depending on your assignment.
 
 Using Eclipse
@@ -51,11 +51,11 @@ Once you have downloaded the project and you want to run the main class you can 
 ```shell
 cd jf-skeleton
 mvn install
-java -jar target/jf2012-executable.jar
+java -jar target/jf2013-executable.jar
 ```
 
-Now you can edit your homework and rerun the sample. The *pom.xml* instructs the *jf2012-executable.jar* to execute
-the *ee.ut.jf2012.Main* class by default. If you want to use some other class then you also need to update the *pom.xml*.
+Now you can edit your homework and rerun the sample. The *pom.xml* instructs the *jf2013-executable.jar* to execute
+the *ee.ut.jf2013.Main* class by default. If you want to use some other class then you also need to update the *pom.xml*.
 
 Submitting your assignment
 --------------------------

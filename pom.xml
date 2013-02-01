@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>ee.ut</groupId>
-  <artifactId>jf2012-hw1</artifactId>
+  <artifactId>jf2013-hw1</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>jf2012-hw1</name>
-  <url>http://maven.apache.org</url>
+  <name>jf2013-hw1</name>
+  <url>https://github.com/zeroturnaround/jf-skeleton</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -37,17 +37,17 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>ee.ut.jf2012.Main</mainClass>
+              <mainClass>ee.ut.jf2013.Main</mainClass>
             </manifest>
           </archive>
-          <finalName>jf2012-executable</finalName>
+          <finalName>jf2013-executable</finalName>
         </configuration>
       </plugin>
       <!-- This plugin will package all dependencies to the final runtime -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.4</version>
+        <version>2.0</version>
         <executions>
           <execution>
             <phase>package</phase>

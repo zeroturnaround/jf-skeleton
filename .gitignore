@@ -1,4 +1,4 @@
 .settings
 target
-.idea
-*.iml
+/.idea
+/*.iml
