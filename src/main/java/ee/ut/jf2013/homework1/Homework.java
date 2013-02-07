@@ -15,6 +15,9 @@ public class Homework {
     }
 
     public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            throw new RuntimeException("Please specify file name");
+        }
         String fileName = args[0];
         new Homework().reverseBinaryFileContent(fileName);
     }
