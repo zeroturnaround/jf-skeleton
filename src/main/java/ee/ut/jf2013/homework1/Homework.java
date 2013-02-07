@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
 
 public class Homework {
     public long square(int x) {
-        return x*x;
+        return x * x;
     }
 
     public String reverse(String str) {
@@ -24,7 +24,7 @@ public class Homework {
 
     private void reverseBinaryFileContent(String fileName) throws IOException {
         try (RandomAccessFile input = new RandomAccessFile(fileName, "rw");
-             RandomAccessFile output = new RandomAccessFile("output.txt", "rw")) {
+             RandomAccessFile output = new RandomAccessFile("output_" + fileName, "rw")) {
             long pointer = input.length() - 1;
             while (pointer > -1) {
                 input.seek(pointer);
