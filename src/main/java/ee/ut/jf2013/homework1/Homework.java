@@ -23,7 +23,7 @@ public class Homework {
     }
 
     private void reverseBinaryFileContent(String fileName) throws IOException {
-        try (RandomAccessFile input = new RandomAccessFile(fileName, "r");
+        try (RandomAccessFile input = new RandomAccessFile(fileName, "rw");
              RandomAccessFile output = new RandomAccessFile("output.txt", "rw")) {
             long pointer = input.length() - 1;
             while (pointer > -1) {
