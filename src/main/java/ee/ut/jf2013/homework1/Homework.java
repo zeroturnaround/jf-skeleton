@@ -19,10 +19,14 @@ public class Homework {
             throw new RuntimeException("Please specify file name");
         }
         String fileName = args[0];
-        new Homework().reverseBinaryFileContent(fileName);
+        new Homework().reverseByteFileContent(fileName);
     }
 
     private void reverseBinaryFileContent(String fileName) throws IOException {
+        //TODO: reverse not chars but bites
+    }
+
+    private void reverseByteFileContent(String fileName) throws IOException {
         try (RandomAccessFile input = new RandomAccessFile(fileName, "rw");
              RandomAccessFile output = new RandomAccessFile("output_" + fileName, "rw")) {
             long pointer = input.length() - 1;
