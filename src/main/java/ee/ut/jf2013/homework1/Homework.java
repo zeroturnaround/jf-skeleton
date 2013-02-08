@@ -30,7 +30,6 @@ public class Homework {
                 input.seek(pointer);
                 output.writeByte(input.readByte());
                 pointer--;
-                output.seek(output.getFilePointer() + 1);
             }
         }
     }
