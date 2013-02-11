@@ -12,41 +12,43 @@ import static org.junit.Assert.assertTrue;
 
 public class BinaryFileReverserTest {
 
-    private final String fileName = "testInputFile.txt";
+    private File inputFile;
+    private String outputFileName;
     private final String initialFileContent = "1234567";
     private BinaryFileReverser fileReverser = new BinaryFileReverser();
 
     @Before
     public void setUp() throws Exception {
-        createNewFileWithContent();
+        inputFile = createNewFileWithContent();
     }
 
     @After
     public void tearDown() throws Exception {
-        new File(fileName).delete();
-        new File(BinaryFileReverser.PREFIX + fileName).delete();
+        new File(outputFileName).delete();
+        outputFileName = null;
     }
 
     @Test
     public void testReversedFileExists() throws Exception {
-        String outputFileName = fileReverser.reverseBinaryFileContent(fileName);
+        outputFileName = fileReverser.reverseBinaryFileContent(inputFile.getAbsolutePath());
         assertTrue(new File(outputFileName).exists());
     }
 
     @Test
     public void testReversedFileContentIsCorrect() throws Exception {
-        String outputFileName = fileReverser.reverseBinaryFileContent(fileName);
+        outputFileName = fileReverser.reverseBinaryFileContent(inputFile.getAbsolutePath());
         BufferedReader reader = new BufferedReader(new FileReader(outputFileName));
         String fileLine = reader.readLine();
         assertEquals(StringUtils.reverse(initialFileContent), fileLine);
         reader.close();
     }
 
-    private void createNewFileWithContent() throws IOException {
-        File file = new File(fileName);
-        file.createNewFile();
+    private File createNewFileWithContent() throws IOException {
+        File file = File.createTempFile("testFile", null);
+        file.deleteOnExit();
         FileWriter writer = new FileWriter(file);
         writer.append(initialFileContent);
         writer.close();
+        return file;
     }
 }
