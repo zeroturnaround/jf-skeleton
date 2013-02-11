@@ -15,7 +15,7 @@ public class BinaryFileReverser {
             throw new IOException("File doesn't exist -> " + fileName);
         }
         String outputFileName = PREFIX + fileName.replaceAll(File.separator, "");
-        try (RandomAccessFile input = new RandomAccessFile(fileName, "rw");
+        try (RandomAccessFile input = new RandomAccessFile(fileName, "r");
              RandomAccessFile output = new RandomAccessFile(outputFileName, "rw")) {
 
             long sizeInBytes = input.getChannel().size();
