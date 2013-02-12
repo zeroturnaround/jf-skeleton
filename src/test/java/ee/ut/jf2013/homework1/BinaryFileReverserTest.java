@@ -1,7 +1,6 @@
 package ee.ut.jf2013.homework1;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +44,7 @@ public class BinaryFileReverserTest {
 
     private File createNewFileWithContent() throws IOException {
         File file = File.createTempFile("testFile", null, new File("."));
-        //file.deleteOnExit();
+        file.deleteOnExit();
         FileWriter writer = new FileWriter(file);
         writer.append(initialFileContent);
         writer.close();
