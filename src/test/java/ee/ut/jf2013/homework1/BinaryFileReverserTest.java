@@ -37,9 +37,12 @@ public class BinaryFileReverserTest {
     }
 
     @Test
-    public void testReversedSingleFileExists() throws Exception {
+    public void testReversedSingleFileIsCorrect() throws Exception {
         fileReverser.reverseBinaryFileContentInSingleFile(inputFile.getAbsolutePath());
-        assertTrue(new File(inputFile.getAbsolutePath()).exists());
+        BufferedReader reader = new BufferedReader(new FileReader(inputFile.getAbsolutePath()));
+        String fileLine = reader.readLine();
+        assertEquals(StringUtils.reverse(initialFileContent), fileLine);
+        reader.close();
     }
 
     private File createNewFileWithContent() throws IOException {

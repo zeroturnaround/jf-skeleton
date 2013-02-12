@@ -45,16 +45,12 @@ public class BinaryFileReverser {
                 public void perform() throws IOException {
                     FileChannel inChannel = file.getChannel();
                     MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, size);
-
                     long pointer = size - 1;
                     while (pointer > size / 2) {
-                        byte right = inMap.get((int) pointer);
                         int opposite = (int) (size - pointer - 1); // get right
-                        byte left = inMap.get(opposite); // get left
-
+                        byte right = inMap.get((int) pointer);
+                        inMap.put((int) (pointer), inMap.get(opposite)); // set left to right
                         inMap.put(opposite, right);
-                        inMap.put((int) (pointer), left);
-
                         pointer--;
                     }
                 }
