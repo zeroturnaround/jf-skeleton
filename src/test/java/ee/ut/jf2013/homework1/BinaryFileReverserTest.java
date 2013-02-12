@@ -22,11 +22,11 @@ public class BinaryFileReverserTest {
         inputFile = createNewFileWithContent();
     }
 
-    @After
+    /*@After
     public void tearDown() throws Exception {
         new File(outputFileName).delete();
         outputFileName = null;
-    }
+    }*/
 
     @Test
     public void testReversedFileExists() throws Exception {
@@ -44,8 +44,8 @@ public class BinaryFileReverserTest {
     }
 
     private File createNewFileWithContent() throws IOException {
-        File file = File.createTempFile("testFile", null);
-        file.deleteOnExit();
+        File file = File.createTempFile("testFile", null, new File("."));
+        //file.deleteOnExit();
         FileWriter writer = new FileWriter(file);
         writer.append(initialFileContent);
         writer.close();

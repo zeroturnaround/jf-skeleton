@@ -3,6 +3,8 @@ package ee.ut.jf2013.homework1;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 
 import static java.lang.System.nanoTime;
 
@@ -27,16 +29,19 @@ public class BinaryFileReverser {
 
             long duration = nanoTime() - startTime;
             long speed = sizeInBytes * 1000_000 / duration; // 1 kB = 1 B / 1000; divide; 1 s =  1 nano / 1000_000_000
-            System.out.println("Duration=" + (double)duration / 1000_000_000 + " seconds, speed= " + speed + " kB/s");
+            System.out.println("Duration=" + (double) duration / 1000_000_000 + " seconds, speed= " + speed + " kB/s");
         }
         return outputFileName;
     }
 
     private void performReadWrite(RandomAccessFile input, RandomAccessFile output) throws IOException {
-        long pointer = input.length() - 1;
+        FileChannel inChannel = input.getChannel();
+        MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
+        MappedByteBuffer outMap = output.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, inChannel.size());
+        long pointer = inChannel.size() - 1;
         while (pointer > -1) {
-            input.seek(pointer);
-            output.writeByte(input.readByte());
+            byte current = inMap.get(); // position++
+            outMap.put((int) pointer, current);
             pointer--;
         }
     }
