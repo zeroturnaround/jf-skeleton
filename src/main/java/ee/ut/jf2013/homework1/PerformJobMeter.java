@@ -18,7 +18,7 @@ public class PerformJobMeter {
         return new PerformJobMeter(fileName, sizeInBytes);
     }
 
-    public void run(Job job) throws IOException {
+    public void execute(Job job) throws IOException {
         System.out.println("Filename=" + fileName + ", file size=" + sizeInBytes);
         long startTime = nanoTime();
 

@@ -21,12 +21,6 @@ public class BinaryFileReverserTest {
         inputFile = createNewFileWithContent();
     }
 
-    /*@After
-    public void tearDown() throws Exception {
-        new File(outputFileName).delete();
-        outputFileName = null;
-    }*/
-
     @Test
     public void testReversedFileExists() throws Exception {
         outputFileName = fileReverser.reverseBinaryFileContent(inputFile.getAbsolutePath());
@@ -42,9 +36,15 @@ public class BinaryFileReverserTest {
         reader.close();
     }
 
+    @Test
+    public void testReversedSingleFileExists() throws Exception {
+        fileReverser.reverseBinaryFileContentInSingleFile(inputFile.getAbsolutePath());
+        assertTrue(new File(inputFile.getAbsolutePath()).exists());
+    }
+
     private File createNewFileWithContent() throws IOException {
         File file = File.createTempFile("testFile", null, new File("."));
-        file.deleteOnExit();
+        //file.deleteOnExit();
         FileWriter writer = new FileWriter(file);
         writer.append(initialFileContent);
         writer.close();

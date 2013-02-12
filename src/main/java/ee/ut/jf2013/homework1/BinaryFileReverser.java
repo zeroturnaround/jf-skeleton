@@ -17,7 +17,7 @@ public class BinaryFileReverser {
         String outputFileName = PREFIX + fileName.replaceAll(File.separator, "");
         try (RandomAccessFile input = new RandomAccessFile(fileName, "r");
              RandomAccessFile output = new RandomAccessFile(outputFileName, "rw")) {
-            createMeter(fileName, input.getChannel().size()).run(new Job() {
+            createMeter(fileName, input.getChannel().size()).execute(new Job() {
                 @Override
                 public void perform() throws IOException {
                     FileChannel inChannel = input.getChannel();
@@ -33,6 +33,33 @@ public class BinaryFileReverser {
             });
         }
         return outputFileName;
+    }
+
+    public void reverseBinaryFileContentInSingleFile(String fileName) throws IOException {
+        checkInputFileExistence(fileName);
+
+        try (RandomAccessFile file = new RandomAccessFile(fileName, "rw")) {
+            final long size = file.getChannel().size();
+            createMeter(fileName, size).execute(new Job() {
+                @Override
+                public void perform() throws IOException {
+                    FileChannel inChannel = file.getChannel();
+                    MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, size);
+
+                    long pointer = size - 1;
+                    while (pointer > size / 2) {
+                        byte right = inMap.get((int) pointer);
+                        int opposite = (int) (size - pointer - 1); // get right
+                        byte left = inMap.get(opposite); // get left
+
+                        inMap.put(opposite, right);
+                        inMap.put((int) (pointer), left);
+
+                        pointer--;
+                    }
+                }
+            });
+        }
     }
 
     private static void checkInputFileExistence(String fileName) throws IOException {
