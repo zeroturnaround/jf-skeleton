@@ -2,6 +2,7 @@ package ee.ut.jf2013.homework1;
 
 import java.io.IOException;
 
+import static java.lang.Integer.MAX_VALUE;
 import static java.lang.System.nanoTime;
 
 public class PerformJobMeter {
@@ -19,7 +20,7 @@ public class PerformJobMeter {
     }
 
     public void execute(Job job) throws IOException {
-        System.out.println("Filename=" + fileName + ", file size=" + sizeInBytes);
+        System.out.println("Filename=" + fileName + ", file size=" + sizeInBytes + ", Integer.MAX_VALUE=" + MAX_VALUE);
         long startTime = nanoTime();
 
         job.perform();

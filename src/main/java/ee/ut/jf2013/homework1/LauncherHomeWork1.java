@@ -7,6 +7,6 @@ public class LauncherHomeWork1 {
         if (args.length == 0) {
             throw new RuntimeException("Please specify file name");
         }
-        new BinaryFileReverser().reverseBinaryFileContent(args[0]);
+        new BinaryFileReverser().reverseBinaryFileContentInSingleFile(args[0]);
     }
 }
