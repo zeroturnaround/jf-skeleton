@@ -13,6 +13,28 @@ public class BinaryFileReverser {
 
     public static final String PREFIX = "output_";
 
+    public void reverseBinaryFileContentInSingleFile(String fileName) throws IOException {
+        checkInputFileExistence(fileName);
+        try (RandomAccessFile file = new RandomAccessFile(fileName, "rw")) {
+            final long size = file.getChannel().size();
+            createMeter(fileName, size).execute(new Job() {
+                @Override
+                public void perform() throws IOException {
+                    FileChannel inChannel = file.getChannel();
+                    MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, size);
+                    long pointer = size - 1;
+                    while (pointer > size / 2) {
+                        int opposite = (int) (size - pointer - 1); // get right
+                        byte right = inMap.get((int) pointer);
+                        inMap.put((int) (pointer), inMap.get(opposite)); // set left to right
+                        inMap.put(opposite, right);
+                        pointer--;
+                    }
+                }
+            });
+        }
+    }
+
     public String reverseBinaryFileContent(String fileName) throws IOException {
         checkInputFileExistence(fileName);
         String outputFileName = PREFIX + fileName.replaceAll(File.separator, "");
@@ -34,28 +56,6 @@ public class BinaryFileReverser {
             });
         }
         return outputFileName;
-    }
-
-    public void reverseBinaryFileContentInSingleFile(String fileName) throws IOException {
-        checkInputFileExistence(fileName);
-        try (RandomAccessFile file = new RandomAccessFile(fileName, "rw")) {
-            final long size = file.getChannel().size();
-            createMeter(fileName, size).execute(new Job() {
-                @Override
-                public void perform() throws IOException {
-                    FileChannel inChannel = file.getChannel();
-                    MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, size);
-                    long pointer = size - 1;
-                    while (pointer > size / 2) {
-                        int opposite = (int) (size - pointer - 1); // get right
-                        byte right = inMap.get((int) pointer);
-                        inMap.put((int) (pointer), inMap.get(opposite)); // set left to right
-                        inMap.put(opposite, right);
-                        pointer--;
-                    }
-                }
-            });
-        }
     }
 
     private static void checkInputFileExistence(String fileName) throws IOException {
