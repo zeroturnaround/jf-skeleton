@@ -24,8 +24,8 @@ public class BinaryFileReverser {
                     MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, size);
                     long pointer = size - 1;
                     while (pointer > size / 2) {
-                        int opposite = (int) (size - pointer - 1); // get right
-                        byte right = inMap.get((int) pointer);
+                        int opposite = (int) (size - pointer - 1);
+                        byte right = inMap.get((int) pointer); // get right
                         inMap.put((int) (pointer), inMap.get(opposite)); // set left to right
                         inMap.put(opposite, right);
                         pointer--;
