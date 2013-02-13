@@ -37,7 +37,6 @@ public class BinaryFileReverser {
 
     public void reverseBinaryFileContentInSingleFile(String fileName) throws IOException {
         checkInputFileExistence(fileName);
-
         try (RandomAccessFile file = new RandomAccessFile(fileName, "rw")) {
             final long size = file.getChannel().size();
             createMeter(fileName, size).execute(new Job() {
