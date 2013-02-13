@@ -8,6 +8,8 @@ import java.nio.channels.FileChannel;
 
 import static ee.ut.jf2013.homework1.PerformJobMeter.Job;
 import static ee.ut.jf2013.homework1.PerformJobMeter.createMeter;
+import static java.nio.channels.FileChannel.MapMode.READ_ONLY;
+import static java.nio.channels.FileChannel.MapMode.READ_WRITE;
 
 public class BinaryFileReverser {
 
@@ -17,11 +19,11 @@ public class BinaryFileReverser {
         checkInputFileExistence(fileName);
         try (RandomAccessFile file = new RandomAccessFile(fileName, "rw")) {
             final long size = file.getChannel().size();
+
             createMeter(fileName, size).execute(new Job() {
                 @Override
                 public void perform() throws IOException {
-                    FileChannel inChannel = file.getChannel();
-                    MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_WRITE, 0, size);
+                    MappedByteBuffer inMap = file.getChannel().map(READ_WRITE, 0, size);
                     long pointer = size - 1;
                     while (pointer > size / 2) {
                         int opposite = (int) (size - pointer - 1);
@@ -44,8 +46,8 @@ public class BinaryFileReverser {
                 @Override
                 public void perform() throws IOException {
                     FileChannel inChannel = input.getChannel();
-                    MappedByteBuffer inMap = inChannel.map(FileChannel.MapMode.READ_ONLY, 0, inChannel.size());
-                    MappedByteBuffer outMap = output.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, inChannel.size());
+                    MappedByteBuffer inMap = inChannel.map(READ_ONLY, 0, inChannel.size());
+                    MappedByteBuffer outMap = output.getChannel().map(READ_WRITE, 0, inChannel.size());
                     long pointer = inChannel.size() - 1;
                     while (pointer > -1) {
                         byte current = inMap.get(); // position++

@@ -10,6 +10,9 @@ public class PerformJobMeter {
     private String fileName;
     private long sizeInBytes;
 
+    private  PerformJobMeter() {
+    }
+
     public PerformJobMeter(String fileName, long sizeInBytes) {
         this.fileName = fileName;
         this.sizeInBytes = sizeInBytes;
