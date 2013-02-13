@@ -30,4 +30,7 @@ public class PerformJobMeter {
         System.out.println("Duration=" + (double) duration / 1000_000_000 + " seconds, speed= " + speed + " kB/s");
     }
 
+    public interface Job {
+        void perform() throws IOException;
+    }
 }

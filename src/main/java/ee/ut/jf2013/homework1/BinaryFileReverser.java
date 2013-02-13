@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
+import static ee.ut.jf2013.homework1.PerformJobMeter.Job;
 import static ee.ut.jf2013.homework1.PerformJobMeter.createMeter;
 
 public class BinaryFileReverser {
