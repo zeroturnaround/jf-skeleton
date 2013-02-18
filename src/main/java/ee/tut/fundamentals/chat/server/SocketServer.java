@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -25,7 +22,8 @@ import java.util.Set;
 public class SocketServer {
 
     static Map<String, SocketChannel> clients = new HashMap<>();
-    private static CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();;
+    private static CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
+    private static final CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
     public static void main(String[] args) throws Exception {
         startJetty();
@@ -41,8 +39,19 @@ public class SocketServer {
                 Set<SelectionKey> keys = selector.selectedKeys();
 
                 for (SelectionKey key : keys) {
-                    if (key.isAcceptable()) handleAccept(key);
-                    else if (key.isReadable()) handleRead(key);
+                    if (key.isAcceptable()) {
+                        ServerSocketChannel srv = (ServerSocketChannel) key.channel();
+                        SocketChannel client = srv.accept();
+                        client.configureBlocking(false);
+                        client.register(key.selector(), SelectionKey.OP_READ);
+                    }
+                    else if (key.isReadable()) {
+                        SocketChannel client = (SocketChannel) key.channel();
+                        ByteBuffer buf = ByteBuffer.allocate(10);
+                        client.read(buf);
+                        buf.flip();
+                        clients.put(decoder.decode(buf).toString().trim(), client);
+                    }
                     keys.remove(key);
                 }
             }
@@ -68,28 +77,13 @@ public class SocketServer {
                 System.out.println(content);
                 SocketChannel channel = clients.get(author.trim());
                 if (channel != null) {
-                    channel.write(encoder.encode(CharBuffer.wrap(content)));
+                    ByteBuffer buffer = encoder.encode(CharBuffer.wrap(content));
+                    channel.write(buffer);
+                    buffer.flip();
                 }
             }
         });
         server.start();
-    }
-
-    private static void handleRead(SelectionKey key) throws IOException {
-        SocketChannel client = (SocketChannel) key.channel();
-        ByteBuffer buf = ByteBuffer.allocate(10);
-        client.read(buf);
-        buf.flip();
-        CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-        clients.put(decoder.decode(buf).toString().trim(), client);
-    }
-
-    private static void handleAccept(SelectionKey key) throws IOException {
-        ServerSocketChannel srv = (ServerSocketChannel) key.channel();
-        SocketChannel client = srv.accept();
-        client.configureBlocking(false);
-        client.register(key.selector(), SelectionKey.OP_READ);
-        //client.register(key.selector(), SelectionKey.OP_WRITE);
     }
 
 }
