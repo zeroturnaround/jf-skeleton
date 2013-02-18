@@ -12,6 +12,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.*;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -50,7 +51,12 @@ public class SocketServer {
                         ByteBuffer buf = ByteBuffer.allocate(10);
                         client.read(buf);
                         buf.flip();
-                        clients.put(decoder.decode(buf).toString().trim(), client);
+                        String name = decoder.decode(buf).toString().trim();
+                        client.write(encode("Welcome, " + name + ", to simple server."));
+                        clients.put(name, client);
+                    } else if (key.isWritable()) {
+                        System.out.println("data writing");
+
                     }
                     keys.remove(key);
                 }
@@ -77,13 +83,15 @@ public class SocketServer {
                 System.out.println(content);
                 SocketChannel channel = clients.get(author.trim());
                 if (channel != null) {
-                    ByteBuffer buffer = encoder.encode(CharBuffer.wrap(content));
-                    channel.write(buffer);
-                    buffer.flip();
+                    channel.write(encode(content));
                 }
             }
         });
         server.start();
+    }
+
+    private static ByteBuffer encode(String message) throws CharacterCodingException {
+        return encoder.encode(CharBuffer.wrap(message + "\r\n"));
     }
 
 }
