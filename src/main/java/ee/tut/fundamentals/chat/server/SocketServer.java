@@ -40,28 +40,46 @@ public class SocketServer {
                 Set<SelectionKey> keys = selector.selectedKeys();
 
                 for (SelectionKey key : keys) {
-                    if (key.isAcceptable()) {
-                        ServerSocketChannel srv = (ServerSocketChannel) key.channel();
-                        SocketChannel client = srv.accept();
-                        client.configureBlocking(false);
-                        client.register(key.selector(), SelectionKey.OP_READ);
-                    }
-                    else if (key.isReadable()) {
-                        SocketChannel client = (SocketChannel) key.channel();
-                        ByteBuffer buf = ByteBuffer.allocate(10);
-                        client.read(buf);
-                        buf.flip();
-                        String name = decoder.decode(buf).toString().trim();
-                        client.write(encode("Welcome, " + name + ", to simple server."));
-                        clients.put(name, client);
-                    } else if (key.isWritable()) {
-                        System.out.println("data writing");
-
-                    }
+                    handleKey(key);
                     keys.remove(key);
                 }
             }
 
+        }
+    }
+
+    private static void handleKey(SelectionKey key) throws IOException {
+        if (key.isAcceptable()) {
+            ServerSocketChannel srv = (ServerSocketChannel) key.channel();
+            SocketChannel client = srv.accept();
+            client.configureBlocking(false);
+            client.register(key.selector(), SelectionKey.OP_READ);
+        }
+        else if (key.isReadable()) {
+            SocketChannel client = (SocketChannel) key.channel();
+            ByteBuffer buf = ByteBuffer.allocate(10);
+            client.read(buf);
+            buf.flip();
+            String name = decoder.decode(buf).toString().trim();
+            if (clients.containsKey(name)) {
+                System.out.println("Client with such name: " + name + " already exists!");
+                client.close();
+                return;
+            }
+            if ("".equals(name)) {
+                for (Map.Entry<String, SocketChannel> entry : clients.entrySet()) {
+                    if (entry.getValue().equals(client)) {
+                        System.out.println(entry.getKey() + " left the chat");
+                        clients.remove(entry.getKey());
+                        client.close();
+                        return;
+                    }
+                }
+            }
+            client.write(encode("Welcome, " + name + ", to simple server."));
+            clients.put(name, client);
+        } else if (key.isWritable()) {
+            System.out.println("data writing");
         }
     }
 
@@ -81,8 +99,7 @@ public class SocketServer {
                 String message = params.isEmpty() ? "" : params.iterator().next();
                 String content = author + ": " + message;
                 System.out.println(content);
-                SocketChannel channel = clients.get(author.trim());
-                if (channel != null) {
+                for (SocketChannel channel : clients.values()) {
                     channel.write(encode(content));
                 }
             }
