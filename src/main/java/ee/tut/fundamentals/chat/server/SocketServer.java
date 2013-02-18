@@ -10,18 +10,25 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class SocketServer {
+
+    static Map<String, SocketChannel> clients = new HashMap<>();
+    private static CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();;
+
     public static void main(String[] args) throws Exception {
         startJetty();
-
 
         try (ServerSocketChannel server = ServerSocketChannel.open()) {
             server.configureBlocking(false);
@@ -47,14 +54,25 @@ public class SocketServer {
         Server server = new Server(8080);
         server.setHandler(new AbstractHandler() {
             @Override
-            public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+            public void handle(String s, Request request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException, ServletException {
                 request.setHandled(true);
-                httpServletResponse.getWriter().println("Hello world");
-                httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+                String author = httpRequest.getHeader("author");
+                if (author == null) {
+                    httpResponse.getWriter().println("TEST -> WORKS");
+                    httpResponse.setStatus(HttpServletResponse.SC_OK);
+                    return;
+                }
+                Set<String> params = httpRequest.getParameterMap().keySet();
+                String message = params.isEmpty() ? "" : params.iterator().next();
+                String content = author + ": " + message;
+                System.out.println(content);
+                SocketChannel channel = clients.get(author.trim());
+                if (channel != null) {
+                    channel.write(encoder.encode(CharBuffer.wrap(content)));
+                }
             }
         });
         server.start();
-        //server.join();
     }
 
     private static void handleRead(SelectionKey key) throws IOException {
@@ -63,7 +81,7 @@ public class SocketServer {
         client.read(buf);
         buf.flip();
         CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
-        String msg = decoder.decode(buf).toString();
+        clients.put(decoder.decode(buf).toString().trim(), client);
     }
 
     private static void handleAccept(SelectionKey key) throws IOException {
@@ -71,6 +89,7 @@ public class SocketServer {
         SocketChannel client = srv.accept();
         client.configureBlocking(false);
         client.register(key.selector(), SelectionKey.OP_READ);
+        //client.register(key.selector(), SelectionKey.OP_WRITE);
     }
 
 }
