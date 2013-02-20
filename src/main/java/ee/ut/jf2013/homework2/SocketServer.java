@@ -1,4 +1,4 @@
-package ee.tut.fundamentals.chat.server;
+package ee.ut.jf2013.homework2;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class SocketServer {
 
-    static Map<String, SocketChannel> clients = new HashMap<>();
+    private static Map<String, SocketChannel> clients = new HashMap<>();
     private static CharsetEncoder encoder = Charset.forName("UTF-8").newEncoder();
     private static final CharsetDecoder decoder = Charset.forName("UTF-8").newDecoder();
 
