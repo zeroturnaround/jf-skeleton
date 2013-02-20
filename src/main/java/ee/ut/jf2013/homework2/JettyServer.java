@@ -29,11 +29,11 @@ public class JettyServer {
                     return;
                 }
                 Set<String> params = httpRequest.getParameterMap().keySet();
-                String message = params.isEmpty() ? "" : params.iterator().next();
-                String content = author + ": " + message;
-                System.out.println(content);
+                String body = params.isEmpty() ? "" : params.iterator().next();
+                String finalMessage = author + ": " + body;
+                System.out.println(finalMessage);
                 for (SocketChannel channel : clients.values()) {
-                    channel.write(encode(content));
+                    channel.write(encode(finalMessage));
                 }
             }
         });
