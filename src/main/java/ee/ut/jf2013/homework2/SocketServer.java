@@ -41,7 +41,6 @@ public class SocketServer {
             while (true) {
                 selector.select();
                 Set<SelectionKey> keys = selector.selectedKeys();
-
                 for (SelectionKey key : keys) {
                     handleKey(key);
                     keys.remove(key);
@@ -53,37 +52,48 @@ public class SocketServer {
 
     private static void handleKey(SelectionKey key) throws IOException {
         if (key.isAcceptable()) {
-            ServerSocketChannel srv = (ServerSocketChannel) key.channel();
-            SocketChannel client = srv.accept();
-            client.configureBlocking(false);
-            client.register(key.selector(), OP_READ);
+            acceptChannel(key);
         } else if (key.isReadable()) {
-            SocketChannel client = (SocketChannel) key.channel();
-            ByteBuffer buf = ByteBuffer.allocate(10);
-            client.read(buf);
-            buf.flip();
-            String name = decoder.decode(buf).toString().trim();
-            if (clients.containsKey(name)) {
-                System.out.println("Client with such name: " + name + " already exists!");
-                client.close();
-                return;
-            }
-            if ("".equals(name)) {
-                for (Map.Entry<String, SocketChannel> entry : clients.entrySet()) {
-                    if (entry.getValue().equals(client)) {
-                        System.out.println(entry.getKey() + " left the chat");
-                        clients.remove(entry.getKey());
-                        client.close();
-                        return;
-                    }
-                }
-            }
-            System.out.println(name + " is connected to the server.");
-            client.write(encode("Welcome, " + name + ", to simple server."));
-            clients.put(name, client);
-        } else if (key.isWritable()) {
-            System.out.println("data writing");
+            readInputChannel((SocketChannel) key.channel());
         }
+    }
+
+    private static void acceptChannel(SelectionKey key) throws IOException {
+        ServerSocketChannel srv = (ServerSocketChannel) key.channel();
+        SocketChannel client = srv.accept();
+        client.configureBlocking(false);
+        client.register(key.selector(), OP_READ);
+    }
+
+    private static void readInputChannel(SocketChannel client) throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate(10);
+        client.read(buf);
+        buf.flip();
+        String name = decoder.decode(buf).toString().trim();
+        if (clients.containsKey(name) && blockClient(client, name) || name.equals("") && disconnectClient(client)) {
+            return;
+        }
+        System.out.println(name + " is connected to the server.");
+        client.write(encode("Welcome, " + name + ", to simple server."));
+        clients.put(name, client);
+    }
+
+    private static boolean blockClient(SocketChannel client, String name) throws IOException {
+        System.out.println("Client with such name: " + name + " already exists!");
+        client.close();
+        return true;
+    }
+
+    private static boolean disconnectClient(SocketChannel client) throws IOException {
+        for (Map.Entry<String, SocketChannel> entry : clients.entrySet()) {
+            if (entry.getValue().equals(client)) {
+                System.out.println(entry.getKey() + " left the chat");
+                clients.remove(entry.getKey());
+                client.close();
+                return true;
+            }
+        }
+        return false;
     }
 
     static ByteBuffer encode(String message) throws CharacterCodingException {
