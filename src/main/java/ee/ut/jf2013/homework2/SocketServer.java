@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static ee.ut.jf2013.homework2.JettyServer.startJetty;
+import static java.nio.channels.SelectionKey.OP_ACCEPT;
+import static java.nio.channels.SelectionKey.OP_READ;
 
 public class SocketServer {
 
@@ -34,7 +36,7 @@ public class SocketServer {
             server.configureBlocking(false);
             server.socket().bind(new InetSocketAddress(8888));
             Selector selector = Selector.open();
-            server.register(selector, SelectionKey.OP_ACCEPT);
+            server.register(selector, OP_ACCEPT);
 
             while (true) {
                 selector.select();
@@ -54,7 +56,7 @@ public class SocketServer {
             ServerSocketChannel srv = (ServerSocketChannel) key.channel();
             SocketChannel client = srv.accept();
             client.configureBlocking(false);
-            client.register(key.selector(), SelectionKey.OP_READ);
+            client.register(key.selector(), OP_READ);
         } else if (key.isReadable()) {
             SocketChannel client = (SocketChannel) key.channel();
             ByteBuffer buf = ByteBuffer.allocate(10);
@@ -76,6 +78,7 @@ public class SocketServer {
                     }
                 }
             }
+            System.out.println(name + " is connected to the server.");
             client.write(encode("Welcome, " + name + ", to simple server."));
             clients.put(name, client);
         } else if (key.isWritable()) {
