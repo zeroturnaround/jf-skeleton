@@ -26,7 +26,10 @@ public class SocketServer {
 
     public static void main(String[] args) throws Exception {
         startJetty(clients);
+        startSocketServer();
+    }
 
+    private static void startSocketServer() throws IOException {
         try (ServerSocketChannel server = ServerSocketChannel.open()) {
             server.configureBlocking(false);
             server.socket().bind(new InetSocketAddress(8888));
