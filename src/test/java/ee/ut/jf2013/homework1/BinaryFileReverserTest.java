@@ -24,7 +24,9 @@ public class BinaryFileReverserTest {
 
     @After
     public void tearDown() throws Exception {
-        new File(outputFileName).deleteOnExit();
+        if (outputFileName != null) {
+            new File(outputFileName).deleteOnExit();
+        }
     }
 
     @Test
