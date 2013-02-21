@@ -84,6 +84,22 @@
               <target>1.7</target>
           </configuration>
       </plugin>
+      <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.3</version>
+          <executions>
+              <execution>
+                  <phase>package</phase>
+                  <configuration>
+                      <descriptorId>src</descriptorId>
+                      <finalName>jf2013-sources</finalName>
+                  </configuration>
+                  <goals>
+                      <goal>single</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
