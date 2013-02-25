@@ -20,21 +20,32 @@ public class DirectoryReader {
         Path source = validateSourceDirectory(parameters);
         Path target = checkAndCreateTargetDirectory(parameters);
 
-        try (DirectoryStream<Path> paths = Files.newDirectoryStream(source)) {
-            for (Path entry : paths) {
+        try (DirectoryStream<Path> sourceDir = Files.newDirectoryStream(source);
+             DirectoryStream<Path> targetDir = Files.newDirectoryStream(target)) {
+            for (Path entry : sourceDir) {
                 if (!isDirectory(entry)) {
                     Path targetFile = target.resolve(entry.getFileName());
                     if (notExists(targetFile)) {
                         Files.copy(entry, targetFile);
                         System.out.println("Created new file: " + targetFile);
-                    } else if (getLastModifiedTime(targetFile).compareTo(getLastModifiedTime(entry)) < 0 ) {
+                    } else if (getLastModifiedTime(targetFile).compareTo(getLastModifiedTime(entry)) < 0) {
                         Files.copy(entry, targetFile, REPLACE_EXISTING);
                         System.out.println("Updated file: " + targetFile);
                     }
                 }
             }
+
+            deleteNotExistingFiles(source, targetDir);
         }
 
+    }
+
+    private static void deleteNotExistingFiles(Path source, DirectoryStream<Path> targetDir) throws IOException {
+        for (Path entry : targetDir) {
+            if (notExists(source.resolve(entry.getFileName()))) {
+                Files.delete(entry);
+            }
+        }
     }
 
     private static Path checkAndCreateTargetDirectory(Map<String, String> parameters) throws IOException {
