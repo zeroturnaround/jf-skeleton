@@ -5,9 +5,9 @@ import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.nio.file.Files.isDirectory;
-import static java.nio.file.Files.notExists;
+import static java.nio.file.Files.*;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Collections.unmodifiableMap;
 
 public class DirectoryReader {
@@ -23,7 +23,14 @@ public class DirectoryReader {
         try (DirectoryStream<Path> paths = Files.newDirectoryStream(source)) {
             for (Path entry : paths) {
                 if (!isDirectory(entry)) {
-                    Files.copy(entry, target.resolve(entry.getFileName()));
+                    Path targetFile = target.resolve(entry.getFileName());
+                    if (notExists(targetFile)) {
+                        Files.copy(entry, targetFile);
+                        System.out.println("Created new file: " + targetFile);
+                    } else if (getLastModifiedTime(targetFile).compareTo(getLastModifiedTime(entry)) < 0 ) {
+                        Files.copy(entry, targetFile, REPLACE_EXISTING);
+                        System.out.println("Updated file: " + targetFile);
+                    }
                 }
             }
         }
