@@ -44,6 +44,7 @@ public class DirectoryReader {
         for (Path entry : targetDir) {
             if (notExists(source.resolve(entry.getFileName()))) {
                 Files.delete(entry);
+                System.out.println("delete file from target which has been removed from source " + entry);
             }
         }
     }
