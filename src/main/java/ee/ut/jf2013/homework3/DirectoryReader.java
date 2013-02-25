@@ -51,7 +51,7 @@ public class DirectoryReader {
                 } else if (ENTRY_MODIFY == kind) {
                     updateFile(target, entry);
                 } else if (ENTRY_DELETE == kind) {
-                    deleteFile(target, entry);
+                    deleteFile(entry, target);
                 }
             }
             key.reset();
@@ -59,8 +59,8 @@ public class DirectoryReader {
 
     }
 
-    private static void deleteFile(Path target, Path entry) throws IOException {
-        Path path = target.resolve(entry.getFileName());
+    private static void deleteFile(Path entry, Path... parent) throws IOException {
+        Path path = parent.length == 0 ? entry : parent[0].resolve(entry.getFileName());
         Files.delete(path);
         System.out.println("delete file from target which has been removed from source " + path);
     }
@@ -78,8 +78,7 @@ public class DirectoryReader {
     private static void deleteNotExistingFiles(Path source, DirectoryStream<Path> targetDir) throws IOException {
         for (Path entry : targetDir) {
             if (notExists(source.resolve(entry.getFileName()))) {
-                Files.delete(entry);
-                System.out.println("delete file from target which has been removed from source " + entry);
+                deleteFile(entry);
             }
         }
     }
