@@ -17,13 +17,12 @@ public class DirectoryMirrorExecutor {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Map<String, String> parameters = readParameters(args);
+        new DirectoryMirrorExecutor().execute(readParameters(args));
+    }
+
+    public void execute(Map<String, String> parameters) throws IOException, InterruptedException {
         Path source = validateSourceDirectory(parameters);
         Path target = checkAndCreateTargetDirectory(parameters);
-
-        WatchService service = fileSystem.newWatchService();
-
-        source.register(service, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
         try (DirectoryStream<Path> sourceDir = Files.newDirectoryStream(source);
              DirectoryStream<Path> targetDir = Files.newDirectoryStream(target)) {
@@ -41,6 +40,13 @@ public class DirectoryMirrorExecutor {
             deleteNotExistingFiles(source, targetDir);
         }
 
+        startWatchService(source, target);
+    }
+
+    private void startWatchService(Path source, Path target) throws IOException, InterruptedException {
+        WatchService service = fileSystem.newWatchService();
+        source.register(service, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+
         WatchKey key;
         while ((key = service.take()).isValid()) {
             for (WatchEvent<?> event : key.pollEvents()) {
@@ -56,26 +62,25 @@ public class DirectoryMirrorExecutor {
             }
             key.reset();
         }
-
     }
 
-    private static void deleteFile(Path entry, Path... parent) throws IOException {
+    private void deleteFile(Path entry, Path... parent) throws IOException {
         Path path = parent.length == 0 ? entry : parent[0].resolve(entry.getFileName());
         Files.delete(path);
         System.out.println("delete file from target which has been removed from source " + path);
     }
 
-    private static void updateFile(Path target, Path entry) throws IOException {
+    private void updateFile(Path target, Path entry) throws IOException {
         Path update = Files.copy(entry, target.resolve(entry.getFileName()), REPLACE_EXISTING);
         System.out.println("Updated file: " + update);
     }
 
-    private static void createFile(Path target, Path entry) throws IOException {
+    private void createFile(Path target, Path entry) throws IOException {
         Path copy = Files.copy(entry, target.resolve(entry.getFileName()));
         System.out.println("Created new file: " + copy);
     }
 
-    private static void deleteNotExistingFiles(Path source, DirectoryStream<Path> targetDir) throws IOException {
+    private void deleteNotExistingFiles(Path source, DirectoryStream<Path> targetDir) throws IOException {
         for (Path entry : targetDir) {
             if (notExists(source.resolve(entry.getFileName()))) {
                 deleteFile(entry);
@@ -83,7 +88,7 @@ public class DirectoryMirrorExecutor {
         }
     }
 
-    private static Path checkAndCreateTargetDirectory(Map<String, String> parameters) throws IOException {
+    private Path checkAndCreateTargetDirectory(Map<String, String> parameters) throws IOException {
         Path target = fileSystem.getPath(parameters.get("target"));
         if (notExists(target, NOFOLLOW_LINKS)) {
             System.out.println("New target directory was successfully created: " + Files.createDirectories(target));
@@ -91,7 +96,7 @@ public class DirectoryMirrorExecutor {
         return target;
     }
 
-    private static Path validateSourceDirectory(Map<String, String> parameters) throws IOException {
+    private Path validateSourceDirectory(Map<String, String> parameters) throws IOException {
         Path source = fileSystem.getPath(parameters.get("source"));
         if (notExists(source, NOFOLLOW_LINKS)) {
             throw new IOException("Source directory doesn't exist!");
@@ -99,8 +104,7 @@ public class DirectoryMirrorExecutor {
         return source;
     }
 
-
-    private static Map<String, String> readParameters(final String[] parameters) {
+    public static Map<String, String> readParameters(final String[] parameters) {
         if (parameters.length < 2) {
             throw new RuntimeException("source or target directories weren't defined in program arguments.");
         }
@@ -111,5 +115,4 @@ public class DirectoryMirrorExecutor {
             }
         });
     }
-
 }
