@@ -67,7 +67,7 @@ public class DirectoryMirrorExecutor {
     private void deleteFile(Path entry, Path... target) throws IOException {
         Path path = target.length == 0 ? entry : target[0].resolve(entry.getFileName());
         Files.delete(path);
-        System.out.println("delete file from target which has been removed from source " + path);
+        System.out.println("Deleted file from target which has been removed from source " + path);
     }
 
     private void updateFile(Path entry, Path target) throws IOException {
@@ -106,7 +106,7 @@ public class DirectoryMirrorExecutor {
 
     public static Map<String, String> readParameters(final String[] parameters) {
         if (parameters.length < 2) {
-            throw new RuntimeException("source or target directories weren't defined in program arguments.");
+            throw new RuntimeException("Source or target directories weren't defined in program arguments.");
         }
         return unmodifiableMap(new HashMap<String, String>(2) {
             {
