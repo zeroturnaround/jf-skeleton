@@ -11,7 +11,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardWatchEventKinds.*;
 import static java.util.Collections.unmodifiableMap;
 
-public class DirectoryReader {
+public class DirectoryMirrorExecutor {
 
     private final static FileSystem fileSystem = FileSystems.getDefault();
 
