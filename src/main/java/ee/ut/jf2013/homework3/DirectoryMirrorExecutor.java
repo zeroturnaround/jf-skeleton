@@ -30,9 +30,9 @@ public class DirectoryMirrorExecutor {
                 if (!isDirectory(entry)) {
                     Path targetFile = target.resolve(entry.getFileName());
                     if (notExists(targetFile)) {
-                        createFile(target, entry);
+                        createFile(entry, target);
                     } else if (getLastModifiedTime(targetFile).compareTo(getLastModifiedTime(entry)) < 0) {
-                        updateFile(target, entry);
+                        updateFile(entry, target);
                     }
                 }
             }
@@ -53,9 +53,9 @@ public class DirectoryMirrorExecutor {
                 WatchEvent.Kind<Path> kind = (WatchEvent.Kind<Path>) event.kind();
                 Path entry = source.resolve((Path) event.context());
                 if (ENTRY_CREATE == kind) {
-                    createFile(target, entry);
+                    createFile(entry, target);
                 } else if (ENTRY_MODIFY == kind) {
-                    updateFile(target, entry);
+                    updateFile(entry, target);
                 } else if (ENTRY_DELETE == kind) {
                     deleteFile(entry, target);
                 }
@@ -64,18 +64,18 @@ public class DirectoryMirrorExecutor {
         }
     }
 
-    private void deleteFile(Path entry, Path... parent) throws IOException {
-        Path path = parent.length == 0 ? entry : parent[0].resolve(entry.getFileName());
+    private void deleteFile(Path entry, Path... target) throws IOException {
+        Path path = target.length == 0 ? entry : target[0].resolve(entry.getFileName());
         Files.delete(path);
         System.out.println("delete file from target which has been removed from source " + path);
     }
 
-    private void updateFile(Path target, Path entry) throws IOException {
+    private void updateFile(Path entry, Path target) throws IOException {
         Path update = Files.copy(entry, target.resolve(entry.getFileName()), REPLACE_EXISTING);
         System.out.println("Updated file: " + update);
     }
 
-    private void createFile(Path target, Path entry) throws IOException {
+    private void createFile(Path entry, Path target) throws IOException {
         Path copy = Files.copy(entry, target.resolve(entry.getFileName()));
         System.out.println("Created new file: " + copy);
     }
