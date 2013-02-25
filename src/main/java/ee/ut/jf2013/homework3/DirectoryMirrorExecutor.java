@@ -62,6 +62,7 @@ public class DirectoryMirrorExecutor {
             }
             key.reset();
         }
+        System.out.println("Source directory was removed.");
     }
 
     private void deleteFile(Path entry, Path... target) throws IOException {
