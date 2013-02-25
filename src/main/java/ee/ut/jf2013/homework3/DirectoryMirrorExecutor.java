@@ -77,8 +77,13 @@ public class DirectoryMirrorExecutor {
     }
 
     private void createFile(Path entry, Path target) throws IOException {
-        Path copy = Files.copy(entry, target.resolve(entry.getFileName()));
-        System.out.println("Created new file: " + copy);
+        Path path = target.resolve(entry);
+        if (Files.exists(path)) {
+            updateFile(entry, target);
+        } else {
+            Path copy = Files.copy(entry, path);
+            System.out.println("Created new file: " + copy);
+        }
     }
 
     private void deleteNotExistingFiles(Path source, DirectoryStream<Path> targetDir) throws IOException {
