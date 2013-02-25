@@ -1,13 +1,11 @@
 package ee.ut.jf2013.homework3;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.notExists;
 import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.util.Collections.unmodifiableMap;
@@ -19,8 +17,17 @@ public class DirectoryReader {
 
     public static void main(String[] args) throws IOException {
         Map<String, String> parameters = readParameters(args);
-        validateSourceDirectory(parameters);
-        checkAndCreateTargetDirectory(parameters);
+        Path source = validateSourceDirectory(parameters);
+        Path target = checkAndCreateTargetDirectory(parameters);
+
+        try (DirectoryStream<Path> paths = Files.newDirectoryStream(source)) {
+            for (Path entry : paths) {
+                if (!isDirectory(entry)) {
+                    Files.copy(entry, target.resolve(entry.getFileName()));
+                }
+            }
+        }
+
     }
 
     private static Path checkAndCreateTargetDirectory(Map<String, String> parameters) throws IOException {
@@ -31,10 +38,12 @@ public class DirectoryReader {
         return target;
     }
 
-    private static void validateSourceDirectory(Map<String, String> parameters) throws IOException {
-        if (notExists(fileSystem.getPath(parameters.get("source")), NOFOLLOW_LINKS)) {
+    private static Path validateSourceDirectory(Map<String, String> parameters) throws IOException {
+        Path source = fileSystem.getPath(parameters.get("source"));
+        if (notExists(source, NOFOLLOW_LINKS)) {
             throw new IOException("Source directory doesn't exist!");
         }
+        return source;
     }
 
 
