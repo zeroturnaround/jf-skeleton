@@ -29,12 +29,14 @@ public class JettyServer {
                     httpResponse.setStatus(HttpServletResponse.SC_OK);
                     return;
                 }
-                String line = new BufferedReader(httpRequest.getReader()).readLine();
-                String body = line == null ? "" : line;
-                String finalMessage = author + ": " + body;
-                System.out.println(finalMessage);
-                for (SocketChannel channel : clients.values()) {
-                    channel.write(encode(finalMessage));
+                try (BufferedReader reader = new BufferedReader(httpRequest.getReader())) {
+                    String line = reader.readLine();
+                    String body = line == null ? "" : line;
+                    String finalMessage = author + ": " + body;
+                    System.out.println(finalMessage);
+                    for (SocketChannel channel : clients.values()) {
+                        channel.write(encode(finalMessage));
+                    }
                 }
             }
         });
