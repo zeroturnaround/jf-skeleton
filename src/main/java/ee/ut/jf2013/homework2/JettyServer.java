@@ -7,6 +7,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.Map;
@@ -28,8 +29,8 @@ public class JettyServer {
                     httpResponse.setStatus(HttpServletResponse.SC_OK);
                     return;
                 }
-                Set<String> params = httpRequest.getParameterMap().keySet();
-                String body = params.isEmpty() ? "" : params.iterator().next();
+                String line = new BufferedReader(httpRequest.getReader()).readLine();
+                String body = line == null ? "" : line;
                 String finalMessage = author + ": " + body;
                 System.out.println(finalMessage);
                 for (SocketChannel channel : clients.values()) {
