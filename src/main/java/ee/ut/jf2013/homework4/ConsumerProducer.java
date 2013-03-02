@@ -1,21 +1,24 @@
 package ee.ut.jf2013.homework4;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Stack;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ConsumerProducer {
 
+    public static final int PRODUCERS_AMOUNT = 6;
+    public static final int CONSUMERS_AMOUNT = 8;
+
     public static void main(String[] args) {
-        //final BlockingQueue<Integer> messages = new ArrayBlockingQueue<>(15);
+        //final BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(15);
         final TunedBlockingQueue queue = new TunedBlockingQueue(15);
 
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < PRODUCERS_AMOUNT; i++) {
             new Thread(new Producer(queue)).start();
         }
 
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < CONSUMERS_AMOUNT; i++) {
             new Thread(new Consumer(queue)).start();
         }
     }
@@ -31,8 +34,7 @@ class Producer implements Runnable {
     @Override
     public void run() {
         while (true) {
-            int element = (int) (Math.random());
-            System.out.println(element);
+            int element = ThreadLocalRandom.current().nextInt();
             queue.add(element);
         }
     }
@@ -49,7 +51,7 @@ class Consumer implements Runnable {
     public void run() {
         while (true) {
             Integer integer = queue.get();
-            System.out.println(integer);
+            System.out.println("Got " + integer);
         }
     }
 }
@@ -58,33 +60,41 @@ class TunedBlockingQueue {
 
     private final int size;
 
-    private final List<Integer> queue = new ArrayList();
+    private final Stack<Integer> queue = new Stack();
 
 
     TunedBlockingQueue(int size) {
         this.size = size;
     }
 
-    public synchronized void add(Integer element) {
-        if (queue.size() > size) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                System.out.println("Cannot wait to add the element -> " + e);
+    public void add(Integer element) {
+        synchronized (queue) {
+            while (queue.size() >= size) {
+                try {
+                    queue.wait();
+                } catch (InterruptedException e) {
+                    System.out.println("Cannot wait to add the element -> " + e);
+                }
             }
+            System.out.println("Added " + element);
+            queue.push(element);
+            queue.notifyAll();
         }
-        queue.add(element);
-
     }
 
-    public synchronized Integer get() {
-        if (queue.isEmpty()) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                System.out.println("Cannot wait to get the element -> " + e);
+    public Integer get() {
+        Integer result;
+        synchronized (queue) {
+            while (queue.isEmpty()) {
+                try {
+                    queue.wait();
+                } catch (InterruptedException e) {
+                    System.out.println("Cannot wait to get the element -> " + e);
+                }
             }
+            result = queue.pop();
+            queue.notifyAll();
         }
-        return queue.iterator().next();
+        return result;
     }
 }
