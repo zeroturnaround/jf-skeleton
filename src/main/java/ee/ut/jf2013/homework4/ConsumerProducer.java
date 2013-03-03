@@ -10,6 +10,7 @@ public class ConsumerProducer {
 
     public static final int PRODUCERS_AMOUNT = 6;
     public static final int CONSUMERS_AMOUNT = 8;
+    public static final int TIME_TO_WAIT = 5000;
 
     public static void main(String[] args) throws InterruptedException {
         final TunedBlockingQueue queue = new TunedBlockingQueue(15);
@@ -28,7 +29,7 @@ public class ConsumerProducer {
             thread.start();
         }
 
-        Thread.sleep(5000);
+        Thread.sleep(TIME_TO_WAIT);
 
         for (Thread thread : threads) {
             thread.interrupt();
