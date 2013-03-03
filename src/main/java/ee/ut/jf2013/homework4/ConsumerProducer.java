@@ -36,6 +36,7 @@ class Producer implements Runnable {
         while (true) {
             int element = ThreadLocalRandom.current().nextInt();
             queue.add(element);
+            System.out.println(Thread.currentThread().getName() + " added " + element);
         }
     }
 }
@@ -51,7 +52,7 @@ class Consumer implements Runnable {
     public void run() {
         while (true) {
             Integer integer = queue.get();
-            System.out.println("Got " + integer);
+            System.out.println(Thread.currentThread().getName() + " got " + integer);
         }
     }
 }
@@ -71,12 +72,12 @@ class TunedBlockingQueue {
         synchronized (queue) {
             while (queue.size() >= size) {
                 try {
+                    System.out.println("Queue is full -> waiting wait when some element will be poped.");
                     queue.wait();
                 } catch (InterruptedException e) {
                     System.out.println("Cannot wait to add the element -> " + e);
                 }
             }
-            System.out.println("Added " + element);
             queue.push(element);
             queue.notifyAll();
         }
@@ -87,6 +88,7 @@ class TunedBlockingQueue {
         synchronized (queue) {
             while (queue.isEmpty()) {
                 try {
+                    System.out.println("Queue is empty -> wait for new element");
                     queue.wait();
                 } catch (InterruptedException e) {
                     System.out.println("Cannot wait to get the element -> " + e);
