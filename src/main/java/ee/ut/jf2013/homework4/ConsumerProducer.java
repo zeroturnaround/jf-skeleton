@@ -39,11 +39,9 @@ public class ConsumerProducer {
     }
 }
 
-class Producer extends Thread {
-    private final TunedBlockingQueue queue;
-
+class Producer extends User {
     Producer(TunedBlockingQueue queue) {
-        this.queue = queue;
+        super(queue);
     }
 
     @Override
@@ -57,11 +55,9 @@ class Producer extends Thread {
     }
 }
 
-class Consumer extends Thread {
-    private final TunedBlockingQueue queue;
-
+class Consumer extends User {
     Consumer(TunedBlockingQueue queue) {
-        this.queue = queue;
+        super(queue);
     }
 
     @Override
@@ -71,6 +67,14 @@ class Consumer extends Thread {
             System.out.println(Thread.currentThread().getName() + " got " + integer);
         }
         System.out.println(Thread.currentThread().getName() + " finished it's execution");
+    }
+}
+
+abstract class User extends Thread {
+    final TunedBlockingQueue queue;
+    User(TunedBlockingQueue queue) {
+        this.queue = queue;
+        setName(getClass().getSimpleName() + "_" + getName());
     }
 }
 
