@@ -11,8 +11,13 @@ class Producer extends User {
     public void run() {
         while (!isInterrupted()) {
             int element = ThreadLocalRandom.current().nextInt();
-            queue.add(element);
-            System.out.println(Thread.currentThread().getName() + " added " + element);
+            try {
+                queue.add(element);
+                System.out.println(Thread.currentThread().getName() + " added " + element);
+            } catch (InterruptedException e) {
+                System.out.println(getName() + " cannot wait to add the element -> " + e);
+                return;
+            }
         }
         System.out.println(Thread.currentThread().getName() + " finished it's execution");
     }
