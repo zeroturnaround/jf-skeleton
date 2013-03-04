@@ -1,6 +1,6 @@
 package ee.ut.jf2013.homework4;
 
-import java.util.concurrent.ThreadLocalRandom;
+import static java.util.concurrent.ThreadLocalRandom.current;
 
 class Producer extends User {
     Producer(TunedBlockingQueue queue) {
@@ -9,8 +9,8 @@ class Producer extends User {
 
     @Override
     protected void doAction() throws InterruptedException {
-        int element = ThreadLocalRandom.current().nextInt();
+        int element = current().nextInt();
         queue.add(element);
-        System.out.println(Thread.currentThread().getName() + " added " + element);
+        System.out.println(getName() + " added " + element);
     }
 }
