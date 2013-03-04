@@ -18,7 +18,7 @@ abstract class User extends Thread {
                 return;
             }
         }
-        System.out.println(Thread.currentThread().getName() + " finished it's execution");
+        System.out.println(getName() + " finished it's execution");
     }
 
     protected abstract void doAction() throws InterruptedException;
