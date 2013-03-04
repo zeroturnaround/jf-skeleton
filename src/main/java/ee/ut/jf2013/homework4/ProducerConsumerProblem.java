@@ -8,7 +8,7 @@ public class ProducerConsumerProblem {
 
     public static final int PRODUCERS_AMOUNT = 6;
     public static final int CONSUMERS_AMOUNT = 8;
-    public static final int TIME_TO_WAIT = 2000;
+    public static final int TIME_TO_WAIT = 5000;
 
     public static void main(String[] args) throws InterruptedException {
         final TunedBlockingQueue queue = new TunedBlockingQueue(15);

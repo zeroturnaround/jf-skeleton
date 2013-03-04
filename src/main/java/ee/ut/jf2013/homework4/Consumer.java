@@ -6,16 +6,8 @@ class Consumer extends User {
     }
 
     @Override
-    public void run() {
-        while (!isInterrupted()) {
-            try {
-                Integer integer = queue.get();
-                System.out.println(Thread.currentThread().getName() + " got " + integer);
-            } catch (InterruptedException e) {
-                System.out.println(getName() + " cannot wait to get the element -> " + e);
-                return;
-            }
-        }
-        System.out.println(Thread.currentThread().getName() + " finished it's execution");
+    protected void doAction() throws InterruptedException {
+        Integer integer = queue.get();
+        System.out.println(Thread.currentThread().getName() + " got " + integer);
     }
 }
