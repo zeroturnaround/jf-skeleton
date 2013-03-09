@@ -22,11 +22,24 @@ public class MoneyTransfer {
 
     }
 
+    @SuppressWarnings("unused")
     static synchronized boolean transferMoney(Account from, Account to, BigDecimal amount) {
         if (from.getBalance().compareTo(amount) < 0) {
             return false;
         }
         to.deposit(from.withdraw(amount));
         return true;
+    }
+
+    @SuppressWarnings("unused")
+    static synchronized void printAllBalancesAndSum(Collection<Account> accounts) {
+        BigDecimal sum = BigDecimal.ZERO;
+        StringBuilder balances = new StringBuilder();
+        for (Account account : accounts) {
+            sum = sum.add(account.getBalance());
+            balances.append(account.getBalance()).append(" ");
+        }
+        balances.append(sum);
+        System.out.println(balances);
     }
 }
