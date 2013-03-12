@@ -2,6 +2,8 @@ package ee.ut.jf2013.homework5;
 
 import ee.ut.jf2013.homework5.AccountsFactory.Account;
 
+import java.io.BufferedOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
@@ -11,6 +13,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class MoneyTransfer {
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private PrintStream stream = new PrintStream(new BufferedOutputStream(System.out));
 
     public static void main(String[] args) throws InterruptedException {
         int n = 5;
@@ -59,13 +63,12 @@ public class MoneyTransfer {
     void printAllBalancesAndSum(Collection<Account> accounts) {
         lock.writeLock().lock();
         int sum = 0;
-        StringBuilder balances = new StringBuilder();
         for (Account account : accounts) {
             sum += account.getBalance();
-            balances.append(account.getBalance()).append(" ");
+            stream.append(Integer.toString(account.getBalance())).append(" ");
         }
-        balances.append(sum);
-        System.out.println(balances);
+        stream.append(Integer.toString(sum)).println();
+        stream.flush();
         lock.writeLock().unlock();
     }
 }
