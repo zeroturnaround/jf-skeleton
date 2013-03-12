@@ -1,16 +1,16 @@
 package ee.ut.jf2013.homework5;
 
+import ee.ut.jf2013.homework5.AccountsFactory.Account;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import ee.ut.jf2013.homework5.AccountsFactory.Account;
-
 public class MoneyTransfer {
 
-    static ReadWriteLock lock = new ReentrantReadWriteLock();
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public static void main(String[] args) throws InterruptedException {
         int n = 5;
@@ -18,6 +18,10 @@ public class MoneyTransfer {
             n = Integer.parseInt(args[0]);
         }
 
+        new MoneyTransfer().start(n);
+    }
+
+    private void start(int n) throws InterruptedException {
         final Collection<Account> accounts = new ArrayList<>(n);
 
         final CountDownLatch countDown = new CountDownLatch(n);
@@ -49,11 +53,10 @@ public class MoneyTransfer {
         countDown.await();
 
         printAllBalancesAndSum(accounts);
-
     }
 
 
-    static synchronized void printAllBalancesAndSum(Collection<Account> accounts) {
+    void printAllBalancesAndSum(Collection<Account> accounts) {
         lock.writeLock().lock();
         int sum = 0;
         StringBuilder balances = new StringBuilder();
