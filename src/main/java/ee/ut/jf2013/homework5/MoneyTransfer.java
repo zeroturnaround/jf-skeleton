@@ -1,13 +1,17 @@
 package ee.ut.jf2013.homework5;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import ee.ut.jf2013.homework5.AccountsFactory.Account;
 
 public class MoneyTransfer {
+
+    static ReadWriteLock lock = new ReentrantReadWriteLock();
+
     public static void main(String[] args) throws InterruptedException {
         int n = 5;
         if (args.length > 0) {
@@ -18,7 +22,7 @@ public class MoneyTransfer {
 
         final CountDownLatch countDown = new CountDownLatch(n);
 
-        AccountsFactory factory = new AccountsFactory(countDown);
+        AccountsFactory factory = new AccountsFactory(countDown, lock);
 
         for (int i = 0; i < n; i++) {
             Account account = factory.createAccount(n);
@@ -48,24 +52,17 @@ public class MoneyTransfer {
 
     }
 
-    @SuppressWarnings("unused")
-    static synchronized boolean transferMoney(Account from, Account to, BigDecimal amount) {
-        if (from.getBalance().compareTo(amount) < 0) {
-            return false;
-        }
-        to.deposit(from.withdraw(amount));
-        return true;
-    }
 
-    @SuppressWarnings("unused")
     static synchronized void printAllBalancesAndSum(Collection<Account> accounts) {
-        BigDecimal sum = BigDecimal.ZERO;
+        lock.writeLock().lock();
+        int sum = 0;
         StringBuilder balances = new StringBuilder();
         for (Account account : accounts) {
-            sum = sum.add(account.getBalance());
+            sum += account.getBalance();
             balances.append(account.getBalance()).append(" ");
         }
         balances.append(sum);
         System.out.println(balances);
+        lock.writeLock().unlock();
     }
 }
