@@ -21,8 +21,7 @@ public class AccountsFactory {
     }
 
     public Account createAccount(int initialBalance) {
-        Account account = new Account(createdAccounts);
-        account.balance = new AtomicInteger(initialBalance);
+        Account account = new Account(initialBalance);
         createdAccounts.add(account);
         return account;
     }
@@ -33,7 +32,8 @@ public class AccountsFactory {
 
         private Thread donator;
 
-        private Account(final List<Account> createdAccounts) {
+        private Account(int balance) {
+            this.balance = new AtomicInteger(balance);
             donator = new Thread(new Runnable() {
                 List<Account> recipients = createdAccounts;
 
@@ -61,18 +61,14 @@ public class AccountsFactory {
         }
 
         public void withdraw(int amount) {
-            //lock.writeLock().lock();
             if (balance.get() < amount) {
                 throw new RuntimeException("Insufficient funds!");
             }
             balance.addAndGet(-amount);
-            //lock.writeLock().unlock();
         }
 
         public void deposit(int amount) {
-            //lock.writeLock().lock();
             balance.addAndGet(amount);
-            //lock.writeLock().unlock();
         }
 
         public void startDonation() {
