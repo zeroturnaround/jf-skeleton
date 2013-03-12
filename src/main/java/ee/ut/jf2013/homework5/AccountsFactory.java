@@ -3,14 +3,21 @@ package ee.ut.jf2013.homework5;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static java.math.BigDecimal.ONE;
 
 public class AccountsFactory {
 
-    static List<Account> createdAccounts = new ArrayList<>();
+    private final CountDownLatch countDownLatch;
 
-    public static Account createAccount(int initialBalance) {
+    private final List<Account> createdAccounts = new ArrayList<>();
+
+    public AccountsFactory(CountDownLatch countDownLatch) {
+        this.countDownLatch = countDownLatch;
+    }
+
+    public Account createAccount(int initialBalance) {
         Account account = new Account(createdAccounts);
         account.balance = new BigDecimal(initialBalance);
         createdAccounts.add(account);
@@ -18,7 +25,7 @@ public class AccountsFactory {
     }
 
 
-    static class Account {
+    class Account {
         private BigDecimal balance;
 
         Thread donator;
@@ -38,6 +45,7 @@ public class AccountsFactory {
                                 System.err.println("Interrupted exception occurred.");
                             }
                     }
+                    countDownLatch.countDown();
                 }
             });
         }
@@ -53,6 +61,10 @@ public class AccountsFactory {
 
         public void deposit(BigDecimal amount) {
             balance = balance.add(amount);
+        }
+
+        public void startDonation() {
+            donator.start();
         }
     }
 }

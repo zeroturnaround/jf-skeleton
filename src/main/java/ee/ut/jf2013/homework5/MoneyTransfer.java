@@ -3,11 +3,12 @@ package ee.ut.jf2013.homework5;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
 
-import static ee.ut.jf2013.homework5.AccountsFactory.Account;
+import ee.ut.jf2013.homework5.AccountsFactory.Account;
 
 public class MoneyTransfer {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         int n = 5;
         if (args.length > 0) {
             n = Integer.parseInt(args[0]);
@@ -15,10 +16,35 @@ public class MoneyTransfer {
 
         final Collection<Account> accounts = new ArrayList<>(n);
 
+        final CountDownLatch countDown = new CountDownLatch(n);
+
+        AccountsFactory factory = new AccountsFactory(countDown);
+
         for (int i = 0; i < n; i++) {
-            Account account = AccountsFactory.createAccount(n);
+            Account account = factory.createAccount(n);
             accounts.add(account);
         }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (countDown.getCount() > 0) {
+                    printAllBalancesAndSum(accounts);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        System.err.println(e.getMessage());
+                    }
+                }
+            }
+        }).start();
+
+        for (Account account : accounts) {
+            account.startDonation();
+        }
+        countDown.await();
+
+        printAllBalancesAndSum(accounts);
 
     }
 
