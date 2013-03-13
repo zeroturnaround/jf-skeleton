@@ -1,17 +1,19 @@
 package ee.ut.jf2013.homework5;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
+
+import static java.util.Collections.unmodifiableCollection;
 
 public class AccountsFactory {
 
     private final CountDownLatch countDownLatch;
     private final ReadWriteLock lock;
 
-    private final List<Account> createdAccounts = new ArrayList<>();
+    private Collection<Account> recipients = new ArrayList<>();
 
     private final int ONE = 1;
 
@@ -22,8 +24,15 @@ public class AccountsFactory {
 
     public Account createAccount(int initialBalance) {
         Account account = new Account(initialBalance);
-        createdAccounts.add(account);
+        recipients.add(account);
         return account;
+    }
+
+    public void startTransfersBetweenAccounts() {
+        recipients = unmodifiableCollection(recipients);
+        for (Account account : recipients) {
+            account.startDonation();
+        }
     }
 
 
@@ -35,8 +44,6 @@ public class AccountsFactory {
         private Account(int balance) {
             this.balance = new AtomicInteger(balance);
             donator = new Thread(new Runnable() {
-                List<Account> recipients = createdAccounts;
-
                 @Override
                 public void run() {
                     for (Account recipient : recipients) {
@@ -75,7 +82,7 @@ public class AccountsFactory {
             lock.readLock().unlock();
         }
 
-        public void startDonation() {
+        private void startDonation() {
             donator.start();
         }
     }

@@ -51,9 +51,7 @@ public class MoneyTransfer {
             }
         }).start();
 
-        for (Account account : accounts) {
-            account.startDonation();
-        }
+        factory.startTransfersBetweenAccounts();
         countDown.await();
 
         printAllBalancesAndSum(accounts);
