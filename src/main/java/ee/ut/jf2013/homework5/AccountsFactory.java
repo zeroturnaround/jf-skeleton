@@ -42,10 +42,7 @@ public class AccountsFactory {
                     for (Account recipient : recipients) {
                         if (recipient != Account.this)
                             try {
-                                lock.readLock().lock();
-                                withdraw(ONE);
-                                recipient.deposit(ONE);
-                                lock.readLock().unlock();
+                                transferMoneyTo(recipient);
                                 Thread.sleep(100);
                             } catch (InterruptedException e) {
                                 System.err.println("Interrupted exception occurred.");
@@ -69,6 +66,13 @@ public class AccountsFactory {
 
         public void deposit(int amount) {
             balance.addAndGet(amount);
+        }
+
+        public void transferMoneyTo(Account recipient) {
+            lock.readLock().lock();
+            withdraw(ONE);
+            recipient.deposit(ONE);
+            lock.readLock().unlock();
         }
 
         public void startDonation() {
