@@ -31,13 +31,6 @@
       <artifactId>jetty-server</artifactId>
       <version>8.1.8.v20121106</version>
     </dependency>
-    <dependency>
-      <groupId>edu.uci.ics</groupId>
-      <artifactId>crawler4j</artifactId>
-      <version>3.5</version>
-      <type>jar</type>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
 
   <build>
