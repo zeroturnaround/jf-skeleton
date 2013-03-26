@@ -13,6 +13,8 @@ public class Launcher {
 
     private final Queue<String> visitedPages = new ConcurrentLinkedQueue<>();
 
+    Phaser phaser = new Phaser(1);
+
     public static void main(String[] args) throws Exception {
         final InputParameters params = new InputParameters(args);
         new Launcher().start(params);
@@ -21,10 +23,8 @@ public class Launcher {
     private void start(InputParameters params) throws InterruptedException {
         long start = nanoTime();
 
-        Phaser phaser = new Phaser(1);
-
-        Thread thread = new Thread(new WebCrawler(params.getRootUrl(), params.getMaxOfUniqueCrawlPages(), visitedPages, phaser));
-        thread.start();
+        phaser.register();
+        new Thread(new WebCrawler(params.getRootUrl(), params.getMaxOfUniqueCrawlPages(), visitedPages, phaser)).start();
         phaser.arriveAndAwaitAdvance();
 
         System.out.println("JOB IS DONE: " + ((double) (nanoTime() - start) / 1000_000_000) + " seconds.");

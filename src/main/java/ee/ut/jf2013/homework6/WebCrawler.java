@@ -19,12 +19,10 @@ public class WebCrawler implements Runnable {
         this.maxOfUniqueCrawlPages = maxOfUniqueCrawlPages;
         this.visitedPages = visitedPages;
         this.phaser = phaser;
-        phaser.register();
     }
 
     @Override
     public void run() {
-        phaser.arrive();
         URLHandler in = new URLHandler(pageUrl);
         if (visitedPages.size() >= maxOfUniqueCrawlPages || !in.exists()) {
             phaser.arriveAndDeregister();
@@ -37,6 +35,7 @@ public class WebCrawler implements Runnable {
         while (matcher.find() && visitedPages.size() < maxOfUniqueCrawlPages) {
             String w = matcher.group();
             if (!visitedPages.contains(w)) {
+                phaser.register();
                 new Thread(new WebCrawler(pageUrl, maxOfUniqueCrawlPages, visitedPages, phaser)).start();
             }
         }
