@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.*;
 
 import static java.nio.file.Files.*;
-import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -93,7 +92,7 @@ public class DirectoryMirrorExecutor {
 
     private Path checkAndCreateTargetDirectory(Parameters parameters) throws IOException {
         Path target = fileSystem.getPath(parameters.getTarget());
-        if (notExists(target, NOFOLLOW_LINKS)) {
+        if (notExists(target)) {
             System.out.println("New target directory was successfully created: " + Files.createDirectories(target));
         }
         return target;
@@ -101,7 +100,7 @@ public class DirectoryMirrorExecutor {
 
     private Path validateSourceDirectory(Parameters parameters) throws IOException {
         Path source = fileSystem.getPath(parameters.getSource());
-        if (notExists(source, NOFOLLOW_LINKS)) {
+        if (notExists(source)) {
             throw new IOException("Source directory doesn't exist!");
         }
         return source;
