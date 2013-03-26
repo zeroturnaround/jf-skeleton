@@ -1,56 +1,45 @@
 package ee.ut.jf2013.homework6;
 
 
-import java.util.HashSet;
 import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Phaser;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static ee.ut.jf2013.homework6.Launcher.PATTERN;
 
 public class WebCrawler implements Runnable {
 
-    private final InputParameters params;
+    private String pageUrl;
+    private int maxOfUniqueCrawlPages;
+    private Queue<String> visitedPages;
+    private Phaser phaser;
 
-    WebCrawler(InputParameters params) {
-        this.params = params;
+    public WebCrawler(String pageUrl, int maxOfUniqueCrawlPages, Queue<String> visitedPages, Phaser phaser) {
+        this.pageUrl = pageUrl;
+        this.maxOfUniqueCrawlPages = maxOfUniqueCrawlPages;
+        this.visitedPages = visitedPages;
+        this.phaser = phaser;
+        phaser.register();
     }
 
     @Override
     public void run() {
-        Queue<String> toBeExamined = new ArrayBlockingQueue<>(params.getMaxOfUniqueCrawlPages());
-        toBeExamined.offer(params.getRootUrl());
-
-        Set<String> visitedPages = new HashSet<>();
-
-        while (!toBeExamined.isEmpty() && visitedPages.size() <= params.getMaxOfUniqueCrawlPages()) {
-            String pageUrl = toBeExamined.poll();
-
-            URLHandler in = new URLHandler(pageUrl);
-
-            if (!in.exists()) {
-                continue;
-            }
-            String input = in.readAll();
-
-            Matcher matcher = Pattern.compile("http://(\\w+\\.)*(\\w+)").matcher(input);
-
-            // find and print all matches
-            while (matcher.find() && visitedPages.size() <= params.getMaxOfUniqueCrawlPages()) {
-                String w = matcher.group();
-                if (!visitedPages.contains(w)) {
-                    toBeExamined.offer(w);
-                    visitedPages.add(w);
-                }
-            }
-
+        phaser.arrive();
+        URLHandler in = new URLHandler(pageUrl);
+        if (visitedPages.size() >= maxOfUniqueCrawlPages || !in.exists()) {
+            phaser.arriveAndDeregister();
+            return;
         }
 
-        System.out.println("CRAWLER FINISHED IT'S JOB");
-        System.out.println("VISITED PAGES:");
-        for (String page : visitedPages) {
-            System.out.println(page);
+        visitedPages.offer(pageUrl);
+        String input = in.readAll();
+        Matcher matcher = PATTERN.matcher(input);
+        while (matcher.find() && visitedPages.size() < maxOfUniqueCrawlPages) {
+            String w = matcher.group();
+            if (!visitedPages.contains(w)) {
+                new Thread(new WebCrawler(pageUrl, maxOfUniqueCrawlPages, visitedPages, phaser)).start();
+            }
         }
-
+        phaser.arriveAndDeregister();
     }
 }
