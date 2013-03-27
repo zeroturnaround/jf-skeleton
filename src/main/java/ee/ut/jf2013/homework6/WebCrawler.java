@@ -2,23 +2,22 @@ package ee.ut.jf2013.homework6;
 
 
 import java.util.Queue;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
 import static ee.ut.jf2013.homework6.Launcher.PATTERN;
+import static ee.ut.jf2013.homework6.Launcher.phaser;
 
 public class WebCrawler implements Runnable {
 
     private String pageUrl;
     private int maxOfUniqueCrawlPages;
-    private Queue<String> visitedPages;
-    private Phaser phaser;
+    private ConcurrentHashMap<String, Integer> visitedPages;
 
-    public WebCrawler(String pageUrl, int maxOfUniqueCrawlPages, Queue<String> visitedPages, Phaser phaser) {
+    public WebCrawler(String pageUrl, int maxOfUniqueCrawlPages, ConcurrentHashMap<String, Integer> visitedPages) {
         this.pageUrl = pageUrl;
         this.maxOfUniqueCrawlPages = maxOfUniqueCrawlPages;
         this.visitedPages = visitedPages;
-        this.phaser = phaser;
     }
 
     @Override
@@ -28,15 +27,23 @@ public class WebCrawler implements Runnable {
             phaser.arriveAndDeregister();
             return;
         }
+        if (visitedPages.containsKey(pageUrl)) {
+            visitedPages.put(pageUrl, visitedPages.get(pageUrl) + 1);
+        } else {
+            visitedPages.put(pageUrl, 1);
+        }
+        if (visitedPages.size() >= maxOfUniqueCrawlPages) {
+            phaser.forceTermination();
+            return;
+        }
 
-        visitedPages.offer(pageUrl);
         String input = in.readAll();
         Matcher matcher = PATTERN.matcher(input);
         while (matcher.find() && visitedPages.size() < maxOfUniqueCrawlPages) {
             String link = matcher.group();
-            if (!visitedPages.contains(link)) {
+            if (!visitedPages.containsKey(link)) {
                 phaser.register();
-                new Thread(new WebCrawler(link, maxOfUniqueCrawlPages, visitedPages, phaser)).start();
+                new Thread(new WebCrawler(link, maxOfUniqueCrawlPages, visitedPages)).start();
             }
         }
         phaser.arriveAndDeregister();

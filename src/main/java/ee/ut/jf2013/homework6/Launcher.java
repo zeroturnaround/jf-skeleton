@@ -1,7 +1,7 @@
 package ee.ut.jf2013.homework6;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Phaser;
 import java.util.regex.Pattern;
 
@@ -11,9 +11,9 @@ public class Launcher {
 
     public static final Pattern PATTERN = Pattern.compile("http://(\\w+\\.)*(\\w+)");
 
-    private final Queue<String> visitedPages = new ConcurrentLinkedQueue<>();
+    private final ConcurrentHashMap<String, Integer> visitedPages = new ConcurrentHashMap<>();
 
-    Phaser phaser = new Phaser(1);
+    static Phaser phaser = new Phaser(1);
 
     public static void main(String[] args) throws Exception {
         final InputParameters params = new InputParameters(args);
@@ -24,15 +24,15 @@ public class Launcher {
         long start = nanoTime();
 
         phaser.register();
-        new Thread(new WebCrawler(params.getRootUrl(), params.getMaxOfUniqueCrawlPages(), visitedPages, phaser)).start();
+        new Thread(new WebCrawler(params.getRootUrl(), params.getMaxOfUniqueCrawlPages(), visitedPages)).start();
         phaser.arriveAndAwaitAdvance();
 
         System.out.println("JOB IS DONE: " + ((double) (nanoTime() - start) / 1000_000_000) + " seconds.");
         System.out.println(visitedPages.size() + " pages were examined");
 
         System.out.println("VISITED PAGES:");
-        for (String page : visitedPages) {
-            System.out.println(page);
+        for (Map.Entry<String, Integer> entry : visitedPages.entrySet()) {
+            System.out.println(entry.getKey() + " : " + entry.getValue());
         }
     }
 }
