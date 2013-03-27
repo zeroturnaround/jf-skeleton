@@ -34,5 +34,6 @@ public class Launcher {
         for (Map.Entry<String, Integer> entry : visitedPages.entrySet()) {
             System.out.println(entry.getKey() + " : " + entry.getValue());
         }
+        System.exit(0);
     }
 }

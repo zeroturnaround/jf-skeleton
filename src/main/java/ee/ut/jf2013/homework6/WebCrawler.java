@@ -1,7 +1,6 @@
 package ee.ut.jf2013.homework6;
 
 
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
@@ -23,7 +22,7 @@ public class WebCrawler implements Runnable {
     @Override
     public void run() {
         URLHandler in = new URLHandler(pageUrl);
-        if (visitedPages.size() >= maxOfUniqueCrawlPages || !in.exists()) {
+        if (sizeIsExceeded() || !in.exists()) {
             phaser.arriveAndDeregister();
             return;
         }
@@ -32,7 +31,8 @@ public class WebCrawler implements Runnable {
         } else {
             visitedPages.put(pageUrl, 1);
         }
-        if (visitedPages.size() >= maxOfUniqueCrawlPages) {
+
+        if (sizeIsExceeded()) {
             phaser.forceTermination();
             return;
         }
@@ -47,5 +47,9 @@ public class WebCrawler implements Runnable {
             }
         }
         phaser.arriveAndDeregister();
+    }
+
+    private boolean sizeIsExceeded() {
+        return visitedPages.size() >= maxOfUniqueCrawlPages;
     }
 }
