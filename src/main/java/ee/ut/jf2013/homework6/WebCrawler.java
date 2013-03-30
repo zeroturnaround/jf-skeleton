@@ -41,6 +41,9 @@ public class WebCrawler implements Runnable {
         Matcher matcher = PATTERN.matcher(input);
         while (matcher.find() && visitedPages.size() < maxOfUniqueCrawlPages) {
             String link = matcher.group();
+            if (CrawlServer.skipPages.contains(link)) {
+                continue;
+            }
             if (!visitedPages.containsKey(link)) {
                 phaser.register();
                 new Thread(new WebCrawler(link, maxOfUniqueCrawlPages, visitedPages)).start();
