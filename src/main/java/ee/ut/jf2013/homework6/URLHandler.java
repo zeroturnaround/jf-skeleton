@@ -5,9 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static ee.ut.jf2013.homework6.CrawlServer.PATTERN;
 
 public class URLHandler {
 
@@ -34,5 +39,18 @@ public class URLHandler {
 
     public String readAll() {
         return !scanner.hasNextLine() ? "" : scanner.useDelimiter(EVERYTHING_PATTERN).next();
+    }
+
+    public Collection<String> getAllLinks() {
+        Matcher matcher = PATTERN.matcher(readAll());
+        Collection<String> links = new ArrayList<>();
+        while (matcher.find()) {
+            links.add(matcher.group());
+        }
+        return links;
+    }
+
+    public void close() {
+        scanner.close();
     }
 }
