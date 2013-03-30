@@ -4,8 +4,8 @@ package ee.ut.jf2013.homework6;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
-import static ee.ut.jf2013.homework6.Launcher.PATTERN;
-import static ee.ut.jf2013.homework6.Launcher.phaser;
+import static ee.ut.jf2013.homework6.CrawlServer.PATTERN;
+import static ee.ut.jf2013.homework6.CrawlServer.phaser;
 
 public class WebCrawler implements Runnable {
 

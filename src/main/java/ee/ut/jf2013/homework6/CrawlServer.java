@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import static java.lang.System.nanoTime;
 
-public class Launcher {
+public class CrawlServer {
 
     public static final Pattern PATTERN = Pattern.compile("http://(\\w+\\.)*(\\w+)");
 
@@ -17,7 +17,7 @@ public class Launcher {
 
     public static void main(String[] args) throws Exception {
         final InputParameters params = new InputParameters(args);
-        new Launcher().start(params);
+        new CrawlServer().start(params);
     }
 
     private void start(InputParameters params) throws InterruptedException {
