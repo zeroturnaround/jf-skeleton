@@ -1,8 +1,6 @@
 package ee.ut.jf2013.homework6;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Phaser;
 import java.util.regex.Pattern;
@@ -36,10 +34,21 @@ public class CrawlServer {
         System.out.println(visitedPages.size() + " pages were examined");
 
         System.out.println("VISITED PAGES:");
-        for (Map.Entry<String, Integer> entry : visitedPages.entrySet()) {
-            System.out.println(entry.getKey() + " : " + entry.getValue());
+        for (Map.Entry<String, Integer> entry : getSortedLinks()) {
+            System.out.println(entry.getValue() + " : " + entry.getKey());
         }
         System.exit(0);
+    }
+
+    private List<Map.Entry<String, Integer>> getSortedLinks() {
+        ArrayList<Map.Entry<String, Integer>> entries = new ArrayList<>(visitedPages.entrySet());
+        Collections.sort(entries, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                return o2.getValue() - o1.getValue();
+            }
+        });
+        return entries;
     }
 
     private static Collection<String> getDisallowedPages(String url) {
