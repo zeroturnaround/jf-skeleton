@@ -2,9 +2,7 @@ package ee.ut.jf2013.homework6;
 
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
 
-import static ee.ut.jf2013.homework6.CrawlServer.PATTERN;
 import static ee.ut.jf2013.homework6.CrawlServer.phaser;
 
 public class WebCrawler implements Runnable {
@@ -37,19 +35,23 @@ public class WebCrawler implements Runnable {
             return;
         }
 
-        String input = in.readAll();
-        Matcher matcher = PATTERN.matcher(input);
-        while (matcher.find() && visitedPages.size() < maxOfUniqueCrawlPages) {
-            String link = matcher.group();
-            if (CrawlServer.skipPages.contains(link)) {
-                continue;
+        try {
+            for (String link : in.getAllLinks()) {
+                if (sizeIsExceeded()) {
+                    return;
+                }
+                if (CrawlServer.skipPages.contains(link)) {
+                    continue;
+                }
+                if (!visitedPages.containsKey(link)) {
+                    phaser.register();
+                    new Thread(new WebCrawler(link.replaceAll("#(.*?)$", ""), maxOfUniqueCrawlPages, visitedPages)).start();
+                }
             }
-            if (!visitedPages.containsKey(link)) {
-                phaser.register();
-                new Thread(new WebCrawler(link, maxOfUniqueCrawlPages, visitedPages)).start();
-            }
+        } finally {
+            in.close();
+            phaser.arriveAndDeregister();
         }
-        phaser.arriveAndDeregister();
     }
 
     private boolean sizeIsExceeded() {
