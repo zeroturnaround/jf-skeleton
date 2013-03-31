@@ -39,7 +39,6 @@ public class CrawlServer {
             System.out.println(entry.getValue() + " : " + entry.getKey());
         }
         logger.close();
-        System.exit(0);
     }
 
     private List<Map.Entry<String, Integer>> getSortedLinks() {

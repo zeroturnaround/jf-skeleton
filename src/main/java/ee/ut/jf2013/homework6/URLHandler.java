@@ -50,6 +50,8 @@ public class URLHandler {
     }
 
     public void close() {
-        scanner.close();
+        if (exists()) {
+            scanner.close();
+        }
     }
 }
