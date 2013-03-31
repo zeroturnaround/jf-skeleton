@@ -15,6 +15,7 @@ public class CrawlServer {
     static Collection<String> skipPages;
 
     static Phaser phaser = new Phaser(1);
+    static Logger logger = new Logger();
 
     public static void main(String[] args) throws Exception {
         final InputParameters params = new InputParameters(args);
@@ -22,8 +23,8 @@ public class CrawlServer {
     }
 
     private void start(InputParameters params) throws InterruptedException {
+        logger.start();
         long start = nanoTime();
-
         skipPages = getDisallowedPages(params.getRootUrl());
 
         phaser.register();
@@ -37,6 +38,7 @@ public class CrawlServer {
         for (Map.Entry<String, Integer> entry : getSortedLinks()) {
             System.out.println(entry.getValue() + " : " + entry.getKey());
         }
+        logger.close();
         System.exit(0);
     }
 

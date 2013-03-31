@@ -28,8 +28,7 @@ public class URLHandler {
             InputStream is = site.getInputStream();
             scanner = new Scanner(new BufferedInputStream(is), charsetName);
             scanner.useLocale(usLocale);
-        } catch (IOException e) {
-            //System.err.println("Could not open " + pageUrl);
+        } catch (IOException ignored) {
         }
     }
 
